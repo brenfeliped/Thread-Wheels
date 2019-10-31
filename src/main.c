@@ -11,22 +11,35 @@ void * trail(void * id){
     int idTrail = * numtrail + 100;
     while(1){
         pthread_mutex_lock(&acesso[*numtrail][j]);
-        sleep(*numtrail);
-        matrix[*numtrail,j] = idTrail;
+        //sleep(*numtrail);
+        if(j==0){
+            matrix[*numtrail][j] = idTrail;
+        }else{
+            matrix[*numtrail][j] = 0;
+            matrix[*numtrail][j+1] = idTrail;
+        }
         pthread_mutex_unlock(&acesso[*numtrail][j]);
         j++;
         if(j==4) j=0;
     }
     
 }
-
+void  printMatrix(){
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            printf("%d ",matrix[i][j]);
+        }
+        printf("\n");
+    }
+}
 void * car(void * id){
-
+    // thread do player
 }
 int main(){
     int * id;
     pthread_t trails[4];
     pthread_t player;
+    pthread_t screen;
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
             matrix[i][j]=0;
@@ -39,6 +52,14 @@ int main(){
     }
     id = (int *)malloc(sizeof(int));
     *id =99;
-    phread_create(&player,NULL,car,(void *)id);
+    pthread_create(&player,NULL,car,(void *)id);
+    //pthread_create(&screen,NULL,&printMatrix,NULL);
+    printMatrix();
+    for(int i=0;i<4;i++){
+        pthread_join(&trails[i],NULL);
+    }
+    pthread_join(&player,NULL);
+    printMatrix();
+    //pthread_join(&screen,NULL);
     return 0;
 }
