@@ -5,20 +5,20 @@
 
 int matrix[4][4]; 
 pthread_mutex_t  acesso[4][4];
-int j=0;
 void * trail(void * id){
+    int j=0;
     int * numtrail = (int *) id;
-    int idTrail = * numtrail + 100;
+    int idTrail = * numtrail ;//+ 100;
     while(1){
-        pthread_mutex_lock(&acesso[*numtrail][j]);
+        pthread_mutex_lock(&acesso[j][*numtrail]);
         //sleep(*numtrail);
         if(j==0){
-            matrix[*numtrail][j] = idTrail;
+            matrix[j][*numtrail] = idTrail;
         }else{
-            matrix[*numtrail][j] = 0;
-            matrix[*numtrail][j+1] = idTrail;
+            matrix[j][*numtrail] = 0;
+           matrix[j+1][*numtrail] = idTrail;
         }
-        pthread_mutex_unlock(&acesso[*numtrail][j]);
+        pthread_mutex_unlock(&acesso[j][*numtrail]);
         j++;
         if(j==4) j=0;
     }
@@ -27,7 +27,7 @@ void * trail(void * id){
 void  printMatrix(){
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
-            printf("%d ",matrix[i][j]);
+            printf("%d  ",matrix[i][j]);
         }
         printf("\n");
     }
@@ -61,5 +61,6 @@ int main(){
     pthread_join(&player,NULL);
     printMatrix();
     //pthread_join(&screen,NULL);
+
     return 0;
 }
