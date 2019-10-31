@@ -5,10 +5,21 @@
 
 int matrix[4][4]; 
 pthread_mutex_t  acesso[4][4];
-
+int j=0;
 void * trail(void * id){
+    int * numtrail = (int *) id;
+    int idTrail = * numtrail + 100;
+    while(1){
+        pthread_mutex_lock(&acesso[*numtrail][j]);
+        sleep(*numtrail);
+        matrix[*numtrail,j] = idTrail;
+        pthread_mutex_unlock(&acesso[*numtrail][j]);
+        j++;
+        if(j==4) j=0;
+    }
     
 }
+
 void * car(void * id){
 
 }
