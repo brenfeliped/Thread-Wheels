@@ -17,14 +17,12 @@ void * trail(void * id){
     int j=0;
     int * numtrail = (int *) id;
     int idTrail = * numtrail ;
-    printf("IdTrail = %d\n",idTrail);
+    //printf("IdTrail = %d\n",idTrail);
     while(j<4){
-        if(pthread_mutex_lock(&acesso[j][idTrail])){
-            printf("Bloqueado\n");
-        }
+        pthread_mutex_lock(&acesso[j][idTrail]);
         if(idTrail==0) matrix[j][idTrail] = 9;
         else matrix[j][idTrail] = idTrail;
-        if(pthread_mutex_unlock(&acesso[j][idTrail]))printf("Unlock error\n");
+        pthread_mutex_unlock(&acesso[j][idTrail]);
         j++;
         //if(j==4) j=0;
     }
@@ -32,8 +30,8 @@ void * trail(void * id){
     pthread_mutex_lock(&somaThreads);
     CountThreads+=1;
     pthread_mutex_unlock(&somaThreads);
-    printf("Incrementei o count = %d  e idTrail=%d\n",CountThreads,idTrail);
-    sleep(1);
+    //printf("Incrementei o count = %d  e idTrail=%d\n",CountThreads,idTrail);
+    //sleep(1);
     pthread_exit(NULL);
     //return NULL;
 }
@@ -81,13 +79,14 @@ int main(){
     //printf("Dei join nas threads\n");
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
-        pthread_mutex_destroy(&acesso[i][j]);
+            pthread_mutex_destroy(&acesso[i][j]);
         }
     }
     //printf("Detruir os mutex\n");
     pthread_mutex_destroy(&somaThreads);
     //pthread_join((pthread_t)&player,NULL);
-    printf("Cheguei no printMatrix\n");
+    //printf("Cheguei no printMatrix\n");
+    sleep(1);
     printMatrix();
     //pthread_join(&screen,NULL);
     return 0;
