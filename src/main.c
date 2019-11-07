@@ -70,27 +70,22 @@ int main(){
         id = (int *)malloc(sizeof(int));
         *id = i;
         pthread_create(&trails[i],NULL,trail,(void *) id);
-        printf("Criei a thread=%d\n",i);
+        //printf("Criei a thread=%d\n",i);
     }
-    printf("Creie todas as threads\n");
+    //printf("Creie todas as threads\n");
     //id = (int *)malloc(sizeof(int));
     //*id =99;
     //pthread_create(&player,NULL,car,(void *)id);
     //pthread_create(&screen,NULL,&printMatrix,NULL);
     while(CountThreads<3){} // loop de espera
-    //sleep(1);
-    /*for(int i=0;i<4;i++){
-        printf("Esperando Thread=%d\n",i);
-        if(pthread_join((pthread_t)&trails[i],NULL))printf("Deu error no join thread\n");
-    }*/
-    printf("Dei join nas threads\n");
+    //printf("Dei join nas threads\n");
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
-            if(pthread_mutex_destroy(&acesso[i][j]))printf("Error destruição mutex");
+        pthread_mutex_destroy(&acesso[i][j]);
         }
     }
-    printf("Detruir os mutex\n");
-    if(pthread_mutex_destroy(&somaThreads))printf("Error destruição mutex");
+    //printf("Detruir os mutex\n");
+    pthread_mutex_destroy(&somaThreads);
     //pthread_join((pthread_t)&player,NULL);
     printf("Cheguei no printMatrix\n");
     printMatrix();
