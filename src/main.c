@@ -8,7 +8,7 @@ void * trail(void *);
 void printMatrix();
 void * car(void *);
 
-int matrix[4][4];
+char matrix[4][4];
 int CountThreads=0;
 
 pthread_mutex_t  acesso[4][4];
@@ -18,13 +18,46 @@ void * trail(void * id){
     int * numtrail = (int *) id;
     int idTrail = * numtrail ;
     //printf("IdTrail = %d\n",idTrail);
-    while(j<4){
+    while(1){
         pthread_mutex_lock(&acesso[j][idTrail]);
-        if(idTrail==0) matrix[j][idTrail] = 9;
-        else matrix[j][idTrail] = idTrail;
+        matrix[j][idTrail] = idTrail;
+        if(j==0){
+            switch (idTrail){
+            case 0:
+                matrix[j][idTrail] = '!';
+                break;
+            case 1:
+                matrix[j][idTrail] = '@';
+                break;
+            case 2:
+                matrix[j][idTrail] = '&';
+                break;
+            default:
+                matrix[j][idTrail] = '#';
+                break;
+            }
+        }else{
+            matrix[j-1][idTrail] = '0';
+            switch (idTrail){
+            case 0:
+                matrix[j][idTrail] = '!';
+                break;
+            case 1:
+                matrix[j][idTrail] = '@';
+                break;
+            case 2:
+                matrix[j][idTrail] = '&';
+                break;
+            default:
+                matrix[j][idTrail] = '#';
+                break;
+            }
+        }
         pthread_mutex_unlock(&acesso[j][idTrail]);
+        if(j==3)matrix[j][idTrail] = '0';
         j++;
-        //if(j==4) j=0;
+        if(j==4) j=0;
+        sleep(1);
     }
     //sleep(1);
     pthread_mutex_lock(&somaThreads);
@@ -38,7 +71,7 @@ void * trail(void * id){
 void  printMatrix(){
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
-            printf("%d  ",matrix[i][j]);
+            printf("%c  ",matrix[i][j]);
         }
         printf("\n");
     }
@@ -50,11 +83,11 @@ void * car(void * id){
 int main(){
     int * id;
     pthread_t trails[4];
-    //pthread_t player;
+    pthread_t player;
     //pthread_t screen;
       for(int i=0;i<4;i++){ // iniciando a matriz
         for(int j=0;j<4;j++){
-            matrix[i][j]=0;
+            matrix[i][j]='0';
         }
     }
     for(int i=0;i<4;i++){ // iniciando os mutex
@@ -68,15 +101,15 @@ int main(){
         id = (int *)malloc(sizeof(int));
         *id = i;
         pthread_create(&trails[i],NULL,trail,(void *) id);
-        //printf("Criei a thread=%d\n",i);
     }
-    //printf("Creie todas as threads\n");
-    //id = (int *)malloc(sizeof(int));
-    //*id =99;
+    sleep(1);
     //pthread_create(&player,NULL,car,(void *)id);
     //pthread_create(&screen,NULL,&printMatrix,NULL);
-    while(CountThreads<3){} // loop de espera
-    //printf("Dei join nas threads\n");
+    while(CountThreads<3){
+        sleep(1);
+        printMatrix();
+        printf("\n");
+    } // loop de espera
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
             pthread_mutex_destroy(&acesso[i][j]);
