@@ -10,15 +10,20 @@
 void  printEmptyTrail(){
     printf("|       |       |       |       |\n");
 }
-
+void placar(){
+    printf("\033[0;32m===================================\033[0m\n");
+    printf("\033[0;32m==Points:x            Life:\033[0;31m### \033[0m\033[0;32m==\n");
+    printf("\033[0;32m===================================\033[0m\n");
+}
 int  main(void){
     int j=0;
     int pos=0;
     char tecla;
     while(tecla!= 'q'){
         system(CLEAR);
+        placar();
         for(int i=0;i<8;i++)printEmptyTrail();
-        /*printEmptyTrail(); //printf("|       |       |       |       |\n");
+    /*printEmptyTrail();   //printf("|       |       |       |       |\n");
         printEmptyTrail();//printf("|       |       |       |       |\n");
         printEmptyTrail();//printf("|       |       |       |       |\n");
         printEmptyTrail();//printf("|       |       |       |       |\n");
