@@ -60,16 +60,19 @@ int points=0;
 int playerCol = 1;
 int playerRow = 8;
 char tecla;
+int resetGame=0;
+//int gameOver=0;
+
 char matrix[9][4];
 int CountThreads=0;
 pthread_mutex_t  acesso[9][4];
-pthread_mutex_t somaThreads;
+pthread_mutex_t pointsAcesso;
 //Interface funtions
 void  printEmptyTrail(){
     printf("|       |       |       |       |\n");
 }
 void scoreboard(){
-    char lifeStr[4];
+    char lifeStr[4]="";
     switch (lifes){
     case 1:
         strcpy(lifeStr,"#");
@@ -85,7 +88,7 @@ void scoreboard(){
         break;
     }
     printf("%s===================================%s\n",GREEN,RESET);
-    printf("%s==Points:%d            Life:%s%s %s==\n",GREEN,points,RED,lifeStr,GREEN);
+    printf("%s==Points:%s%d%s            Life:%s%s %s==\n",GREEN,RED,points,GREEN,RED,lifeStr,GREEN);
     printf("%s===================================%s\n",GREEN,RESET);
 }
 void screen(){
@@ -130,55 +133,124 @@ void * trail(void * id){
     int i=0;
     int * numtrail = (int *) id;
     int idTrail = * numtrail;
-    //printf("IdTrail = %d\n",idTrail);
-    while(tecla != 'q'){ // condicao temporaria
-        pthread_mutex_lock(&acesso[i][idTrail]);
-        matrix[i][idTrail] = idTrail;
-        if(i==0){
-            switch (idTrail){
-            case 0:
-                if(matrix[8][idTrail]=='!')matrix[8][idTrail]='0';
-                matrix[i][idTrail] = '!';
-                break;
-            case 1:
-                if(matrix[8][idTrail]=='P')matrix[8][idTrail]='0';
-                matrix[i][idTrail] = 'P';
-                break;
-            case 2:
-                if(matrix[8][idTrail]=='&')matrix[8][idTrail]='0';
-                matrix[i][idTrail] = '&';
-                break;
-            default:
-                if(matrix[8][idTrail]=='U')matrix[8][idTrail]='0';
-                matrix[i][idTrail] = 'U';
-                break;
+    while(lifes!=0){ // condicao temporaria
+        if(!pthread_mutex_lock(&acesso[i][idTrail])){ // se tive livre a regiao critica
+            if(i==0){
+                switch (idTrail){
+                case 0:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        if(matrix[8][idTrail]=='!')matrix[8][idTrail]='0';
+                        matrix[i][idTrail] = '!';
+                    }
+                    break;
+                case 1:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        if(matrix[8][idTrail]=='P')matrix[8][idTrail]='0';
+                        matrix[i][idTrail] = 'P';
+                    }
+                    break;
+                case 2:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        if(matrix[8][idTrail]=='&')matrix[8][idTrail]='0';
+                        matrix[i][idTrail] = '&';
+                    }
+                    break;
+                default:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        if(matrix[8][idTrail]=='U')matrix[8][idTrail]='0';
+                        matrix[i][idTrail] = 'U';
+                    }
+                    break;
+                }
+            }else{
+                matrix[i-1][idTrail] = '0';
+                switch (idTrail){
+                case 0:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        matrix[i][idTrail] = '!';
+                    }
+                    break;
+                case 1:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        matrix[i][idTrail] = 'P';
+                    }
+                    break;
+                case 2:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        matrix[i][idTrail] = '&';
+                    }
+                    break;
+                default:
+                    if(matrix[i][idTrail]=='@'){
+                        lifes--;
+                        matrix[i][idTrail]='0';
+                        resetGame=1;
+                    }else{
+                        matrix[i][idTrail] = 'U';
+                    }
+                    break;
+                }
             }
         }else{
-            matrix[i-1][idTrail] = '0';
-            switch (idTrail){
-            case 0:
-                matrix[i][idTrail] = '!';
-                break;
-            case 1:
-                matrix[i][idTrail] = 'P';
-                break;
-            case 2:
-                matrix[i][idTrail] = '&';
-                break;
-            default:
-                matrix[i][idTrail] = 'U';
-                break;
+            if(matrix[i][idTrail]=='@'){
+                lifes--;
+                matrix[i][idTrail]='0';
+                resetGame=1;
             }
         }
+        sleep(idTrail*1+1);
         pthread_mutex_unlock(&acesso[i][idTrail]);
         i++;
-        if(i==9) i=0;
-        sleep(idTrail*1+1);
+        if(i==9){ 
+            i=0;
+            pthread_mutex_lock(&pointsAcesso);
+            switch (idTrail){ // conta pontos
+            case 0:
+                points+=10;
+                break;
+            case 1:
+                points+=20;
+            case 2:
+                points+=30;
+            case 3:
+                points+=40;
+                break;
+            default:
+                break;
+            }
+            pthread_mutex_unlock(&pointsAcesso);
+        }
+        if(resetGame==1)i=0;
     }
     //sleep(1);
-    pthread_mutex_lock(&somaThreads);
-    CountThreads+=1;
-    pthread_mutex_unlock(&somaThreads);
     pthread_exit(NULL);
     //return NULL;
 }
@@ -192,7 +264,7 @@ void  printMatrix(){
 }
 void * car(void * id){
     //char tecla;
-    while(tecla!='q'){
+    while(lifes!=0){
         if(kbhit()==1){ // se uma tecla for digitada
             tecla = (char)getch();
             switch (tecla){
@@ -236,8 +308,9 @@ void * car(void * id){
                 if(playerRow!=0){
                     playerRow=playerRow-1;
                     if(pthread_mutex_trylock(&acesso[playerRow][playerCol])){//posicao acima ocupada(morte)
-                        // implementa a morte e diminuicao de life
-                        tecla='q'; // temporario
+                        lifes--;
+                        matrix[playerRow][playerCol]='0';
+                        resetGame=1;
                     }else{
                         matrix[playerRow+1][playerCol] = '0';
                         matrix[playerRow][playerCol] = '@';
@@ -252,48 +325,51 @@ void * car(void * id){
     }
     pthread_exit(NULL);
 }
-void loopGame(){
-    
-}
-int main(){
-    int * id;
-    pthread_t trails[4];
-    pthread_t player;
-    //pthread_t screen;
-      for(int i=0;i<9;i++){ // iniciando a matriz logica
+void resetMatrix(){
+    playerCol = 1;
+    playerRow = 8;
+    for(int i=0;i<9;i++){ // iniciando a matriz logica
         for(int j=0;j<4;j++){
             if(i==8 && j==1)matrix[i][j]='@'; // posicao incial player
             else matrix[i][j]='0';
         }
     }
-    for(int i=0;i<9;i++){ // iniciando os mutex
-        for(int j=0;j<4;j++){
-            pthread_mutex_init(&acesso[i][j],0);
-        }
-    }
-    pthread_mutex_init(&somaThreads,0);
+}
+void loopGame(){
+    int * id;
+    pthread_t trails[4];
+    pthread_t player;
 
+    for(int i=0;i<9;i++){ // iniciando os mutex
+            for(int j=0;j<4;j++){
+                pthread_mutex_init(&acesso[i][j],0);
+            }
+    }
+    pthread_mutex_init(&pointsAcesso,0);
     for(int i=0;i<4;i++){ // criando as threads trails
-        id = (int *)malloc(sizeof(int));
-        *id = i;
-        pthread_create(&trails[i],NULL,trail,(void *) id);
+            id = (int *)malloc(sizeof(int));
+            *id = i;
+            pthread_create(&trails[i],NULL,trail,(void *) id);
     }
     pthread_create(&player,NULL,car,NULL);
-    //pthread_create(&screen,NULL,&printMatrix,NULL);
-    while(CountThreads<3){
-        usleep(10500);
+     while(lifes!=0){ // loop principal
+        resetMatrix();
+        resetGame = 0;
         screen();
-        printf("\n");
-    } // loop de espera
-    for(int i=0;i<9;i++){
-        for(int j=0;j<4;j++){
-            pthread_mutex_destroy(&acesso[i][j]);
+        while(resetGame!=1){
+            usleep(100000);
+            screen();
+            printf("\n");
         }
     }
-    pthread_mutex_destroy(&somaThreads);
-    //pthread_join((pthread_t)&player,NULL);
-    //printf("Cheguei no printMatrix\n");
-    //sleep(1);
-    //printMatrix();
+
+    for(int i=0;i<9;i++){
+            for(int j=0;j<4;j++){
+                pthread_mutex_destroy(&acesso[i][j]);
+            }
+        }
+}
+int main(){
+    loopGame();
     return 0;
 }
