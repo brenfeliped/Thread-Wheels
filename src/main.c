@@ -54,6 +54,7 @@
 void * trail(void *);
 void printMatrix();
 void * car(void *);
+void loopGame();
 
 int lifes = 3;
 int points=0;
@@ -68,9 +69,6 @@ int CountThreads=0;
 pthread_mutex_t  acesso[9][4];
 pthread_mutex_t pointsAcesso;
 //Interface funtions
-void  printEmptyTrail(){
-    printf("|       |       |       |       |\n");
-}
 void scoreboard(){
     char lifeStr[4]="";
     switch (lifes){
@@ -127,6 +125,60 @@ void screen(){
         }
         printf("\n");
     }
+}
+void Controls(){
+	  char c;
+		while(1){
+			system("clear");
+			printf("\nControles:\n");
+			printf("W avança o veiculo\n");
+			printf("S retrocede o veiculo\n");
+			printf("A/D muda de pista\n");
+			printf("Digite 's' e aperte enter para sair:");
+			scanf("\n%c",&c);
+			if(c == 's'){break;}
+		}
+}
+void Menu(){
+	int selected = 0;
+	
+	while(selected!=3){
+		system(CLEAR);
+		//system ("/bin/stty cooked");
+		printf("\n\n");
+        printf(BLUE);
+		printf(" ########  ##  ## #####    #####  ####    #####\n");
+		printf("    ##     ##  ## ##   ##  ##    ##   ##  ##   ##\n");
+		printf("    ##     ###### ######   ####  #######  ##   ##\n");
+		printf("    ##     ##  ## ####     ##    ##   ##  ##   ##\n");
+		printf("    ##     ##  ## ##  ##   ##### ##   ##  ######  \n");
+		printf("\n");
+        printf(RED);
+		printf(" ##    ## ##  ## #####  ##### ##       ###\n");
+		printf(" ##    ## ##  ## ##     ##    ##     ##   \n");
+		printf(" ##    ## ###### ####   ####  ##      ##  \n");
+		printf(" ## ## ## ##  ## ##     ##    ##        ##\n");
+		printf(" ###  ### ##  ## #####  ##### ###### #### \n");
+		printf("\n");
+        printf(MARGENTA);
+		printf("1.Startgame\n");
+		printf("2.Controles\n");
+		printf("3.Sair\n");
+		printf("\nDigite um número e aperte enter para selecionar a opção:\n");
+		scanf("%d",&selected);
+        printf(RESET);
+		switch(selected){
+			case 1:
+                loopGame();
+			    break;
+			case 2:
+			    Controls();
+			    break;
+			case 3:
+			    break;
+			}
+		}
+    system(CLEAR);
 }
 // end Interface funtions
 void * trail(void * id){
@@ -370,6 +422,6 @@ void loopGame(){
         }
 }
 int main(){
-    loopGame();
+    Menu();
     return 0;
 }

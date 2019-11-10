@@ -21,39 +21,39 @@ void Menu(){
 	int selected = 0;
 	
 	while(1){
-	system("clear");
+		system("clear");
+		//usleep(100000);
+		system ("/bin/stty cooked");
+		printf("\n\n");
+		printf(" ########  ##  ## #####    #####  ####    #####\n");
+		printf("    ##     ##  ## ##   ##  ##    ##   ##  ##   ##\n");
+		printf("    ##     ###### ######   ####  #######  ##   ##\n");
+		printf("    ##     ##  ## ####     ##    ##   ##  ##   ##\n");
+		printf("    ##     ##  ## ##  ##   ##### ##   ##  ######  \n");
+		printf("\n");
 
-	
-	printf("\n\n");
-	printf(" ########  ##  ## #####    #####  ####    #####\n");
-	printf("    ##     ##  ## ##   ##  ##    ##   ##  ##   ##\n");
-	printf("    ##     ###### ######   ####  #######  ##   ##\n");
-	printf("    ##     ##  ## ####     ##    ##   ##  ##   ##\n");
-	printf("    ##     ##  ## ##  ##   ##### ##   ##  ######  \n");
-	printf("\n");
-
-	printf(" ##    ## ##  ## #####  ##### ##       ###\n");
-	printf(" ##    ## ##  ## ##     ##    ##     ##   \n");
-	printf(" ##    ## ###### ####   ####  ##      ##  \n");
-	printf(" ## ## ## ##  ## ##     ##    ##        ##\n");
-	printf(" ###  ### ##  ## #####  ##### ###### #### \n");
-	printf("\n");
-	printf("1.Startgame\n");
-	printf("2.Controles\n");
-	printf("3.Sair\n");
-	printf("\nDigite um número e aperte enter para selecionar a opção:");
-	scanf("%d",&selected);
-	switch(selected){
-		case 1:
-		  break;
-		case 2:
-		  Controls();
-		  break;
-		case 3:
-		  exit(0);
-		  break;
+		printf(" ##    ## ##  ## #####  ##### ##       ###\n");
+		printf(" ##    ## ##  ## ##     ##    ##     ##   \n");
+		printf(" ##    ## ###### ####   ####  ##      ##  \n");
+		printf(" ## ## ## ##  ## ##     ##    ##        ##\n");
+		printf(" ###  ### ##  ## #####  ##### ###### #### \n");
+		printf("\n");
+		printf("1.Startgame\n");
+		printf("2.Controles\n");
+		printf("3.Sair\n");
+		printf("\nDigite um número e aperte enter para selecionar a opção:\n");
+		scanf("%d\n",&selected);
+		switch(selected){
+			case 1:
+			break;
+			case 2:
+			Controls();
+			break;
+			case 3:
+			exit(0);
+			break;
+			}
 		}
-	}
 }
 
 int main()
