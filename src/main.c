@@ -61,11 +61,11 @@ int points=0;
 int playerCol = 1;
 int playerRow = 8;
 char tecla;
+long long int velocidade[4]; //segundos em mcrosegundos
 int resetGame=0;
 //int gameOver=0;
 
 char matrix[9][4];
-int CountThreads=0;
 pthread_mutex_t  acesso[9][4];
 pthread_mutex_t pointsAcesso;
 //Interface funtions
@@ -130,10 +130,13 @@ void Controls(){
 	  char c;
 		while(1){
 			system("clear");
+            printf(RED);
 			printf("\nControles:\n");
+            printf(BLUE);
 			printf("W avança o veiculo\n");
 			printf("S retrocede o veiculo\n");
 			printf("A/D muda de pista\n");
+            printf(YELLOW);
 			printf("Digite 's' e aperte enter para sair:");
 			scanf("\n%c",&c);
 			if(c == 's'){break;}
@@ -160,7 +163,7 @@ void Menu(){
 		printf(" ## ## ## ##  ## ##     ##    ##        ##\n");
 		printf(" ###  ### ##  ## #####  ##### ###### #### \n");
 		printf("\n");
-        printf(MARGENTA);
+        printf(YELLOW);
 		printf("1.Startgame\n");
 		printf("2.Controles\n");
 		printf("3.Sair\n");
@@ -179,6 +182,29 @@ void Menu(){
 			}
 		}
     system(CLEAR);
+}
+void gameOver(){
+    char c=0;
+	system(CLEAR);
+    printf(RED);
+	printf("##########   ####    ##      ##  #####\n");
+	printf("##          ##   ##  ###    ###  ##   \n");
+	printf("##   ###### #######  ## #  # ##  #### \n");
+	printf("##       ## ##   ##  ##  ##  ##  ##   \n");
+	printf("########### ##   ##  ##      ##  #####\n");
+	printf("\n");
+	printf("##########  ##    ## #####  ##### \n");
+	printf("##      ##  ##    ## ##     ##   ##\n");
+	printf("##      ##  ##    ## ####   ######\n");
+	printf("##      ##   ##  ##  ##     ####\n");
+	printf("##########     ##    #####  ##  ##\n");
+    printf(MARGENTA);
+    printf("Seu recorde:%d\n",points);
+    printf("Pressione espaço  para voltar para menu:");
+    while(c!=32){
+        c = getch();
+        if(c==32) break;
+    }
 }
 // end Interface funtions
 void * trail(void * id){
@@ -278,7 +304,8 @@ void * trail(void * id){
                 resetGame=1;
             }
         }
-        sleep(idTrail*1+1);
+        usleep(idTrail*500+velocidade[idTrail]);
+        //sleep(idTrail*1+1);
         pthread_mutex_unlock(&acesso[i][idTrail]);
         i++;
         if(i==9){ 
@@ -290,8 +317,10 @@ void * trail(void * id){
                 break;
             case 1:
                 points+=20;
+                break;
             case 2:
                 points+=30;
+                break;
             case 3:
                 points+=40;
                 break;
@@ -299,6 +328,7 @@ void * trail(void * id){
                 break;
             }
             pthread_mutex_unlock(&pointsAcesso);
+            velocidade[idTrail]-=(rand() % (10000));
         }
         if(resetGame==1)i=0;
     }
@@ -391,7 +421,12 @@ void loopGame(){
     int * id;
     pthread_t trails[4];
     pthread_t player;
-
+    lifes=3;
+    points=0;
+    velocidade[0]=1000000;
+    velocidade[1]=1500000;
+    velocidade[2]=1600000;
+    velocidade[3]=1900000;
     for(int i=0;i<9;i++){ // iniciando os mutex
             for(int j=0;j<4;j++){
                 pthread_mutex_init(&acesso[i][j],0);
@@ -414,12 +449,13 @@ void loopGame(){
             printf("\n");
         }
     }
-
+    pthread_mutex_destroy(&pointsAcesso);
     for(int i=0;i<9;i++){
             for(int j=0;j<4;j++){
                 pthread_mutex_destroy(&acesso[i][j]);
             }
-        }
+    }
+    gameOver();
 }
 int main(){
     Menu();
